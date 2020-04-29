@@ -14,7 +14,7 @@
 */
 
 var data = require('mdn-data/css');
-var localStrings = string.deserialize(await template("L10n:Common"));
+var localStrings = string.deserialize(template("L10n:Common"));
 var types = ["properties", "selectors", "types", "syntaxes", "at-rules",
              "descriptors", "units"];
 var groupingType = "alphabetically";
@@ -556,7 +556,7 @@ for (var characterIndex in characters) {
     for (var i = 0; i < index[character].length; i++) {
         var url = baseURL + index[character][i].urlPath;
         /*
-        //var thisPage = await wiki.getPage(url);   Getting the summary this way is too slow
+        //var thisPage = wiki.getPage(url);   Getting the summary this way is too slow
         var summary = "";
         if (thisPage && thisPage.summary) {
             summary = mdn.escapeQuotes(thisPage.summary);

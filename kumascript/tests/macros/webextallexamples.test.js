@@ -132,23 +132,21 @@ function checkTableDom(dom, locale) {
 
 describeMacro("WebExtAllExamples", function () {
   beforeEachMacro(function (macro) {
-    macro.ctx.mdn.fetchJSONResource = jest.fn(async (url) => testExamplesJson);
+    macro.ctx.mdn.fetchJSONResource = jest.fn((url) => testExamplesJson);
   });
 
-  itMacro("Creates an examples table for en-US", function (macro) {
+  itMacro("Creates an examples table for en-US", (macro) => {
     macro.ctx.env.locale = "en-US";
-    return macro.call().then(function (result) {
-      let dom = jsdom.JSDOM.fragment(result);
-      checkTableDom(dom, "en-US");
-    });
+    let result = macro.call();
+    let dom = jsdom.JSDOM.fragment(result);
+    checkTableDom(dom, "en-US");
   });
 
-  itMacro("Creates an examples table for fr", function (macro) {
+  itMacro("Creates an examples table for fr", (macro) => {
     macro.ctx.env.locale = "fr";
     macro.ctx.allExamples = testExamplesJson;
-    return macro.call().then(function (result) {
-      let dom = jsdom.JSDOM.fragment(result);
-      checkTableDom(dom, "fr");
-    });
+    let result = macro.call();
+    let dom = jsdom.JSDOM.fragment(result);
+    checkTableDom(dom, "fr");
   });
 });

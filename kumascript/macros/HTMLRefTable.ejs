@@ -104,7 +104,7 @@ let TagFilters = {
 let ForcedElements = $0 && $0.elements && Array.isArray($0.elements) ? $0.elements.map(lowerMe) : [];
 let HTMLRefBaseURL = "/docs/Web/HTML/Element";
 let HTMLLocalBaseURL = "/" + env.locale + HTMLRefBaseURL + "/";
-let HTMLDocPages   = await page.subpagesExpand("/en-US" + HTMLRefBaseURL, 1);
+let HTMLDocPages   = page.subpagesExpand("/en-US" + HTMLRefBaseURL, 1);
 let HTMLTags       = [];
 
 
@@ -121,22 +121,22 @@ for(let page of HTMLDocPages) {
     if (ForcedElements.indexOf(t) > -1
     || ((TagFilters.include.length === 0 ||  hasCommonTag(tags, TagFilters.include))
     &&  (TagFilters.exclude.length === 0 || !hasCommonTag(tags, TagFilters.exclude)))){
-        p = await wiki.getPage(HTMLLocalBaseURL + t);
+        p = wiki.getPage(HTMLLocalBaseURL + t);
 
         HTMLTags.push({
             tagName      : t,
             // We need to special case the "Heading elements" article
             // which stand for all hn elements.
             tagLink      : (t !== 'heading_elements'
-                               ? await template("HTMLelement", [t])
-                               : (await Promise.all([
+                               ? template("HTMLelement", [t])
+                               : [
                                    template("HTMLelement", ['h1']),
                                    template("HTMLelement", ['h2']),
                                    template("HTMLelement", ['h3']),
                                    template("HTMLelement", ['h4']),
                                    template("HTMLelement", ['h5']),
                                    template("HTMLelement", ['h6'])
-                               ])).join(', ')),
+                               ].join(', ')),
             summary      : (p && p.summary) || "",
             deprecated   : hasCommonTag(tags, ['deprecated', 'obsolete']),
             experimental : hasCommonTag(tags, ['experimental']),
@@ -163,7 +163,7 @@ if (missingElement.length > 0) {
    for(let t of missingElement) {
         HTMLTags.push({
             tagName      : t,
-            tagLink      : await template("HTMLelement", [t]),
+            tagLink      : template("HTMLelement", [t]),
             summary      : "",
             deprecated   : false,
             experimental : false,
@@ -199,9 +199,9 @@ if (withBadges) {
   <tr>
 <%
 if (withBadges) {
-    badge = HTMLTags[i].deprecated   ? '<span title="' + l10n.deprecated   + '">' + await template("FontAwesomeIcon", ["icon-thumbs-down-alt"]) + '<span>'
-          : HTMLTags[i].experimental ? '<span title="' + l10n.experimental + '">' + await template("FontAwesomeIcon", ["icon-beaker"]) + '<span>'
-          : HTMLTags[i].component    ? '<span title="' + l10n.components   + '">' + await template("FontAwesomeIcon", ["icon-cogs"]) + '<span>'
+    badge = HTMLTags[i].deprecated   ? '<span title="' + l10n.deprecated   + '">' + template("FontAwesomeIcon", ["icon-thumbs-down-alt"]) + '<span>'
+          : HTMLTags[i].experimental ? '<span title="' + l10n.experimental + '">' + template("FontAwesomeIcon", ["icon-beaker"]) + '<span>'
+          : HTMLTags[i].component    ? '<span title="' + l10n.components   + '">' + template("FontAwesomeIcon", ["icon-cogs"]) + '<span>'
           : HTMLTags[i].html5        ? '<a href="/' + env.locale + '/docs/HTML/HTML5"><img alt="HTML5" title="' + l10n.html5 + '" src="/files/3843/HTML5_Badge_32.png" width="16" height="16"></a>'
           : '&nbsp;';
 %>

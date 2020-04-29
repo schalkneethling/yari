@@ -33,7 +33,7 @@ var url = 'https://l10n.mozilla-community.org/webstatus/web_status.json';
 var mdnProjects = ["mdn", "mdn-js", "mdn-promote"];
 var result = [];
 
-var resource = await MDN.fetchJSONResource(url);
+var resource = MDN.fetchJSONResource(url);
 var locales = resource.locales;
 
 if (locales.hasOwnProperty(locale)) {

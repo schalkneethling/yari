@@ -8,4 +8,4 @@ if (string.IsDigit($0)) {
   str = "gecko" + $0;
 }
 %>
-<%- await template("deprecatedGeneric", ["header", str]) %>
+<%- template("deprecatedGeneric", ["header", str]) %>

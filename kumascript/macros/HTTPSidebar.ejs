@@ -199,37 +199,37 @@ var text = mdn.localStringMap({
     <li class="toggle">
         <details <%=state('Web/HTTP/Headers')%>>
             <summary><%=text['Headers']%></summary>
-            <%-await template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Headers'])%>
+            <%-template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Headers'])%>
         </details>
     </li>
     <li class="toggle">
         <details <%=state('Web/HTTP/Methods')%>>
             <summary><%=text['Methods']%></summary>
-            <%-await template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Methods'])%>
+            <%-template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Methods'])%>
         </details>
     </li>
     <li class="toggle">
         <details <%=state('Web/HTTP/Status')%>>
           <summary><%=text['Status']%></summary>
-          <%-await template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Status'])%>
+          <%-template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Status'])%>
         </details>
     </li>
     <li class="toggle">
         <details <%=state('Web/HTTP/Headers/Content-Security-Policy')%>>
           <summary><%=text['CSPDirectives']%></summary>
-          <%-await template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Headers/Content-Security-Policy'])%>
+          <%-template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Headers/Content-Security-Policy'])%>
         </details>
     </li>
     <li class="toggle">
         <details <%=state('Web/HTTP/CORS/Errors')%>>
           <summary><%=text['CORS_errors']%></summary>
-          <%-await template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/CORS/Errors', 1])%>
+          <%-template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/CORS/Errors', 1])%>
         </details>
     </li>
     <li class="toggle">
         <details <%=state('Web/HTTP/Headers/Feature-Policy')%>>
           <summary><%=text['FeaturePolicyDirectives']%></summary>
-          <%-await template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Headers/Feature-Policy', 1])%>
+          <%-template("ListSubpagesForSidebar", ['/en-US/docs/Web/HTTP/Headers/Feature-Policy', 1])%>
         </details>
     </li>
   </ol>

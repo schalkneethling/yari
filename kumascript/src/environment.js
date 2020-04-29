@@ -149,8 +149,8 @@ class Environment {
   // A templating function that we define in the global environment
   // so that templates can invoke other templates. This is not part
   // of the public API of the class; it is for use by other templates
-  async _renderTemplate(name, args) {
-    return await this.templates.render(name, this.getExecutionContext(args));
+  _renderTemplate(name, args) {
+    return this.templates.render(name, this.getExecutionContext(args));
   }
 
   // Get a customized environment object that is specific to a single

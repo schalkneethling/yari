@@ -312,17 +312,17 @@ describeMacro("DefaultAPISidebar", function () {
     macro.ctx.env.slug = "not undefined";
     // Mock calls to L10n-Common and GroupData
     const originalTemplate = macro.ctx.template;
-    macro.ctx.template = jest.fn(async (name, ...args) => {
+    macro.ctx.template = jest.fn((name, ...args) => {
       if (name === "L10n:Common") {
         return commonl10nFixture;
       }
       if (name === "GroupData") {
         return groupDataFixture;
       }
-      return await originalTemplate(name, ...args);
+      return originalTemplate(name, ...args);
     });
     // Mock calls to wiki.getPage()
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       return pagesJSON[url];
     });
   });

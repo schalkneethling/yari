@@ -4,7 +4,7 @@ let lang = env.locale;
 let method = $0.toUpperCase(); // Methods are always uppercase
 let str = $1 || $0;
 let rtlLocales = ['ar', 'he', 'fa'];
-let localStrings = string.deserialize(await template("L10n:Common"));
+let localStrings = string.deserialize(template("L10n:Common"));
 let URL = "/" + lang + '/docs/Web/HTTP/Methods/' + method;
 let anch = '';
 
@@ -13,7 +13,7 @@ if ($2) {
   anch = '#' + $2;
 }
 
-let page = await wiki.getPage(URL);
+let page = wiki.getPage(URL);
 let summary = "";
 
 if (!$2) {

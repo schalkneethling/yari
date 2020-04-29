@@ -46,36 +46,23 @@ describe("Templates class", () => {
     );
   });
 
-  it("can render macros", async () => {
+  it("can render macros", () => {
     let macros = new Templates(dir("macros"));
 
-    let result1 = await macros.render("test1", {});
+    let result1 = macros.render("test1", {});
     expect(result1).toEqual("1");
 
-    let result2 = await macros.render("test2", { n: 2 });
+    let result2 = macros.render("test2", { n: 2 });
     expect(result2).toEqual("3");
   });
 
-  it("macros can use await", async () => {
+  it("macro arguments can be inherited", () => {
     let macros = new Templates(dir("macros"));
-
-    let result = await macros.render("async", {
-      async_adder: function (n) {
-        return new Promise((resolve) => {
-          setTimeout(() => resolve(n + 1));
-        });
-      },
-    });
-    expect(result).toEqual("2\n3");
-  });
-
-  it("macro arguments can be inherited", async () => {
-    let macros = new Templates(dir("macros"));
-    let result = await macros.render("test2", Object.create({ n: 2 }));
+    let result = macros.render("test2", Object.create({ n: 2 }));
     expect(result).toEqual("3");
   });
 
-  it("only loads files once", async () => {
+  it("only loads files once", () => {
     const EJS = require("ejs");
     /**
      * Without `JSON.stringify(…)`, `\` in the file path would be treated
@@ -96,19 +83,19 @@ describe("Templates class", () => {
     const directory = dir("macros");
     const macros = new Templates(directory);
 
-    let result1 = await macros.render("test1");
+    let result1 = macros.render("test1");
     expect(result1).toBe(path.resolve(directory, "test1.ejs"));
     expect(mockLoader.mock.calls.length).toBe(1);
 
-    let result2 = await macros.render("test2");
+    let result2 = macros.render("test2");
     expect(result2).toBe(path.resolve(directory, "Test2.ejs"));
     expect(mockLoader.mock.calls.length).toBe(2);
 
     // Render the macros again, but don't expect any more loads
-    await macros.render("test1");
-    await macros.render("test2");
-    await macros.render("test1");
-    await macros.render("test2");
+    macros.render("test1");
+    macros.render("test2");
+    macros.render("test1");
+    macros.render("test2");
     expect(mockLoader.mock.calls.length).toBe(2);
   });
 });

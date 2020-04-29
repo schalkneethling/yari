@@ -18,7 +18,7 @@ var versionDetails = "";
 // Determine if we should display anything at all by comparing the current
 // Gecko version to the one specified.
 
-var currentGecko = await template("CurrentGecko");
+var currentGecko = template("CurrentGecko");
 
 if (parseInt(currentGecko, 10) - parseInt($1, 10) <= 10) {
 
@@ -54,15 +54,15 @@ if (parseInt(currentGecko, 10) - parseInt($1, 10) <= 10) {
 
 	// Fetch the version details
 
-	versionDetails = await template("geckoRelease", [$1]);
+	versionDetails = template("geckoRelease", [$1]);
 
 	switch(parseInt($0, 10)) {
 		case 0:
 		case 1:
-			%><%-await template("SimpleBadge", [primaryText, "geckoVersionBadge", versionDetails])%><%
+			%><%-template("SimpleBadge", [primaryText, "geckoVersionBadge", versionDetails])%><%
 			break;
 		case 2:
-			%><%-await template("SimpleBanner", [primaryText + " " + versionDetails, "geckoVersionBadge", $2])%><%
+			%><%-template("SimpleBanner", [primaryText + " " + versionDetails, "geckoVersionBadge", $2])%><%
 			break;
 	}
 }

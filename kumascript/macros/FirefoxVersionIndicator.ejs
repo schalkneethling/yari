@@ -19,7 +19,7 @@ var versionDetails = "";
 // Determine if we should display anything at all by comparing the current
 // Gecko version to the one specified.
 
-var currentGecko = await template("CurrentGecko");
+var currentGecko = template("CurrentGecko");
 
 if ((parseInt(currentGecko, 10) - parseInt($1, 10) < 9) || ($0==3)) {
 
@@ -106,10 +106,10 @@ if ((parseInt(currentGecko, 10) - parseInt($1, 10) < 9) || ($0==3)) {
 		case 0:
 		case 1:
         case 3:
-			%><%-await template("SimpleBadge", [versionLink, "firefoxVersionBadge", newIn + productVersion])%><%
+			%><%-template("SimpleBadge", [versionLink, "firefoxVersionBadge", newIn + productVersion])%><%
 			break;
 		case 2:
-			%><%-await template("SimpleBanner", [newIn + productVersion, "firefoxVersionBadge", text])%><%
+			%><%-template("SimpleBanner", [newIn + productVersion, "firefoxVersionBadge", text])%><%
 			break;
 	}
 }

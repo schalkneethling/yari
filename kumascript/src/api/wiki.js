@@ -25,7 +25,7 @@ module.exports = {
   //
   // Doesn't support the revision parameter offered by DekiScript
   //
-  async page(path, section, revision, show, heading) {
+  page(path, section, revision, show, heading) {
     // Adjusts the visibility and heading levels of the specified HTML.
     //
     // The show parameter indicates whether or not the top level

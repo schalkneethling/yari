@@ -15,7 +15,7 @@
 let summary = "";
     
 if (($2 !== false && $0.indexOf("#") === -1) || $2 === true) {
-    let page = await wiki.getPage($0);
+    let page = wiki.getPage($0);
     if (page && page.summary) {
         summary = mdn.escapeQuotes(page.summary);
     } else {

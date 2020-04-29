@@ -153,13 +153,6 @@ const expectedFunctions = [
   "Page.translations",
 ];
 
-const expectedAsync = [
-  "MDN.fetchJSONResource",
-  "MDN.fetchHTTPResource",
-  "wiki.page",
-  "template",
-];
-
 describe("Environment class", () => {
   it.each(expectedObjects)("defines global object %s", (global) => {
     let environment = new Environment({});
@@ -171,14 +164,6 @@ describe("Environment class", () => {
     let environment = new Environment({});
     let context = environment.getExecutionContext([]);
     expect(typeof getValue(context, global)).toBe("function");
-  });
-
-  it.each(expectedAsync)("defines async function %s", (global) => {
-    let environment = new Environment({});
-    let context = environment.getExecutionContext([]);
-    let value = getValue(context, global);
-    expect(typeof value).toBe("function");
-    expect(value.constructor.name).toBe("AsyncFunction");
   });
 
   it("defines values from the environment object", () => {
@@ -238,14 +223,14 @@ describe("Environment class", () => {
     expect(getValue(context, "$9")).toBe("");
   });
 
-  it("defines a template() function that renders templates", async () => {
+  it("defines a template() function that renders templates", () => {
     let mockRender = jest.fn(() => "hello world");
     let mockTemplates = { render: mockRender };
     let environment = new Environment({}, mockTemplates);
     let context = environment.getExecutionContext([]);
     let templateFunction = getValue(context, "template");
 
-    let rendered = await templateFunction("foo", ["1", "2"]);
+    let rendered = templateFunction("foo", ["1", "2"]);
 
     expect(rendered).toBe("hello world");
     expect(mockRender.mock.calls.length).toBe(1);

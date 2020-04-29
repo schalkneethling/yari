@@ -220,7 +220,7 @@ function broadcastWebsocketMessage(msg) {
   // console.log(`Sent to ${i} open clients`);
 }
 
-async function runBuild(sources, options, logger) {
+function runBuild(sources, options, logger) {
   const builder = new Builder(sources, options, logger);
 
   if (options.listLocales) {
@@ -428,7 +428,7 @@ class Builder {
     return path.join(ROOT_DIR, folder);
   }
 
-  async renderMacros(rawHtml, metadata, { cacheResult = false } = {}) {
+  renderMacros(rawHtml, metadata, { cacheResult = false } = {}) {
     // Recursive method that renders the macros within the document
     // represented by this raw HTML and metadata, but only after first
     // rendering all of this document's prerequisites, taking into
@@ -452,7 +452,7 @@ class Builder {
           // When rendering prerequisites, we're only interested in
           // caching the results for later use. We don't care about
           // the results returned.
-          await this.renderMacros(preRawHtml, preMetadata, {
+          this.renderMacros(preRawHtml, preMetadata, {
             cacheResult: true,
           });
         }
@@ -479,7 +479,7 @@ class Builder {
     );
   }
 
-  async start({ specificFolders = null } = {}) {
+  start({ specificFolders = null } = {}) {
     const self = this;
 
     // Clear any cached results and errors.
@@ -489,27 +489,23 @@ class Builder {
       // Check that they all exist and are folders
       const allProcessed = [];
 
-      await Promise.all(
-        specificFolders.map(async (folder) => {
-          const source = this.getSource(folder);
-          let processed;
-          try {
-            processed = await self.processFolder(source, folder);
-          } catch (err) {
-            // If a crash happens inside processFolder it's hard to debug
-            // if you don't know which files/folders caused it. So inject
-            // some logging of that before throwing.
-            self.logger.error(
-              chalk.red(`Error happened processing: ${folder}`)
-            );
-            self.logger.error(err);
-            // XXX need to decide what to do with errors.
-            // We could increment a counter and dump all errors to a log file.
-            throw err;
-          }
-          allProcessed.push(processed);
-        })
-      );
+      specificFolders.map((folder) => {
+        const source = this.getSource(folder);
+        let processed;
+        try {
+          processed = self.processFolder(source, folder);
+        } catch (err) {
+          // If a crash happens inside processFolder it's hard to debug
+          // if you don't know which files/folders caused it. So inject
+          // some logging of that before throwing.
+          self.logger.error(chalk.red(`Error happened processing: ${folder}`));
+          self.logger.error(err);
+          // XXX need to decide what to do with errors.
+          // We could increment a counter and dump all errors to a log file.
+          throw err;
+        }
+        allProcessed.push(processed);
+      });
 
       return allProcessed;
     }
@@ -539,30 +535,8 @@ class Builder {
       counts[key] = 0;
     });
 
-    async function processAndTrackFolder(source, folder) {
-      let processed;
-      try {
-        processed = await self.processFolder(source, folder);
-      } catch (err) {
-        // If a crash happens inside processFolder it's hard to debug
-        // if you don't know which files/folders caused it. So inject
-        // some logging of that before throwing.
-        self.logger.error(chalk.red(`Error happened processing: ${folder}`));
-        self.logger.error(err);
-        // XXX need to decide what to do with errors.
-        // We could increment a counter and dump all errors to a log file.
-        throw err;
-      }
-      const { result, file } = processed;
-      self.printProcessing(result, file);
-      counts[result]++;
-      self.tickProgressbar(++total);
-    }
-
     // Start the real processing
     const t0 = new Date();
-    let pendingFolders = 0;
-    const folderProcessingPromises = [];
 
     for (const { source, localeFolder, folder, files } of self.walkSources()) {
       if (self.excludeFolder(source, folder, localeFolder, files)) {
@@ -602,16 +576,25 @@ class Builder {
           self.tickProgressbar(++total);
         }
       } else {
-        while (pendingFolders > MAX_OPEN_FILES) {
-          await new Promise((resolve) => setTimeout(resolve, 500));
+        let processed;
+        try {
+          processed = self.processFolder(source, folder);
+        } catch (err) {
+          // If a crash happens inside processFolder it's hard to debug
+          // if you don't know which files/folders caused it. So inject
+          // some logging of that before throwing.
+          self.logger.error(chalk.red(`Error happened processing: ${folder}`));
+          self.logger.error(err);
+          // XXX need to decide what to do with errors.
+          // We could increment a counter and dump all errors to a log file.
+          throw err;
         }
-        pendingFolders++;
-        folderProcessingPromises.push(
-          processAndTrackFolder(source, folder).finally(() => pendingFolders--)
-        );
+        const { result, file } = processed;
+        self.printProcessing(result, file);
+        counts[result]++;
+        self.tickProgressbar(++total);
       }
     }
-    await Promise.all(folderProcessingPromises);
     const t1 = new Date();
     self.dumpAllURLs();
     self.summarizeResults(counts, t1 - t0);
@@ -802,14 +785,14 @@ class Builder {
     );
   }
 
-  async watch() {
-    const onChange = async (filepath, source) => {
+  watch() {
+    const onChange = (filepath, source) => {
       const folder = path.dirname(filepath);
       this.logger.info(`${chalk.bold("change")} in ${folder}`);
       const t0 = performance.now();
       // Clear any cached results and errors.
       this.macroRenderer.clearCache();
-      const { result, file, doc } = await this.processFolder(source, folder);
+      const { result, file, doc } = this.processFolder(source, folder);
       const t1 = performance.now();
 
       const tookStr = ppMilliseconds(t1 - t0);
@@ -1181,7 +1164,7 @@ class Builder {
     return false;
   }
 
-  async processFolder(source, folder, config) {
+  processFolder(source, folder, config) {
     const { metadata, metadataRaw } = getMetadata(source, folder);
     const mdn_url = buildMDNUrl(metadata.locale, metadata.slug);
     const mdnUrlLC = mdn_url.toLowerCase();
@@ -1221,7 +1204,7 @@ class Builder {
     } else {
       // Errors while KS rendering will be accumulated during the build
       // and reported at the end.
-      const result = await this.renderMacros(rawHtml, metadata);
+      const result = this.renderMacros(rawHtml, metadata);
       renderedHtml = result.renderedHtml;
     }
 

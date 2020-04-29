@@ -23,12 +23,6 @@ assert.equal = (x, y) => {
   expect(x).toEqual(y);
 };
 
-assert.eventually = {
-  async equal(x, y) {
-    expect(await x).toEqual(y);
-  },
-};
-
 assert.include = (list, element) => {
   expect(list).toContain(element);
 };
@@ -82,8 +76,8 @@ function createMacroTestObject(macroName) {
      * applicable.  Its arguments become the arguments to the
      * macro. It returns a promise.
      */
-    async call(...args) {
-      let rendered = await templates.render(
+    call(...args) {
+      let rendered = templates.render(
         macroName,
         environment.getExecutionContext(args)
       );
@@ -120,8 +114,6 @@ function describeMacro(macroName, runTests) {
  */
 function itMacro(title, runTest) {
   it(title, function () {
-    // Assumes that setup returns a promise (if async) or
-    // undefined (if synchronous).
     return runTest(macro);
   });
 }
@@ -136,8 +128,6 @@ function itMacro(title, runTest) {
  */
 function beforeEachMacro(setup) {
   beforeEach(function () {
-    // Assumes that setup returns a promise (if async) or
-    // undefined (if synchronous).
     return setup(macro);
   });
 }
@@ -152,8 +142,6 @@ function beforeEachMacro(setup) {
  */
 function afterEachMacro(teardown) {
   afterEach(function () {
-    // Assumes that teardown returns a promise (if async) or
-    // undefined (if synchronous).
     return teardown(macro);
   });
 }

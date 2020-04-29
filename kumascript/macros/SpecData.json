@@ -39,13 +39,13 @@
     "url": "https://www.w3.org/TR/wai-aria-practices-1.1/",
     "status": "WD"
   },
-  "Async Function": {
-    "name": "ECMAScript Async Functions",
+  "Function": {
+    "name": "ECMAScript Functions",
     "url": "https://tc39.es/ecmascript-asyncawait/",
     "status": "Draft"
   },
-  "Async Iteration": {
-    "name": "ECMAScript Async Iteration Functions",
+  "Iteration": {
+    "name": "ECMAScript Iteration Functions",
     "url": "https://tc39.es/proposal-async-iteration/",
     "status": "Draft"
   },

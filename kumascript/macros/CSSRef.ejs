@@ -18,8 +18,8 @@ if (slug) {
     var rtlLocales = ['ar', 'he', 'fa'];
 
     var data = require('mdn-data/css');
-    var commonl10n = string.deserialize(await template('L10n:Common'));
-    var cssl10n = string.deserialize(await template('L10n:CSS'));
+    var commonl10n = string.deserialize(template('L10n:Common'));
+    var cssl10n = string.deserialize(template('L10n:CSS'));
 
     var text = {
         'Properties': mdn.getLocalString(commonl10n, 'Properties'),
@@ -124,7 +124,7 @@ if (slug) {
     }
 
     // Load the CSS pages data, gather info for the found properties and atRules
-    var pageList = await page.subpagesExpand('/en-US/docs/Web/CSS');
+    var pageList = page.subpagesExpand('/en-US/docs/Web/CSS');
     for (var i in pageList) {
       var aPage = pageList[i];
       for (var x in groupData) {
@@ -166,15 +166,15 @@ if (slug) {
     // Load sub pages of the group
     var groupPages = [];
     for (var i = 0; i < group.length; i++) {
-        groupPages = groupPages.concat(await page.subpagesExpand('/en-US/docs/Web/CSS/' + group[i].replace(/ /g, '_')));
+        groupPages = groupPages.concat(page.subpagesExpand('/en-US/docs/Web/CSS/' + group[i].replace(/ /g, '_')));
     }
 
     // output helpers
     var badges = {
-      ExperimentalBadge : '<span class="sidebar-icon">' + await template("ExperimentalBadge", [1]) + '</span>',
-      NonStandardBadge  : '<span class="sidebar-icon">' + await template("NonStandardBadge", [1]) + '</span>',
-      DeprecatedBadge   : '<span class="sidebar-icon">' + await template("DeprecatedBadge", [1]) + '</span>',
-      ObsoleteBadge     : '<span class="sidebar-icon">' + await template("ObsoleteBadge", [1]) + '</span>',
+      ExperimentalBadge : '<span class="sidebar-icon">' + template("ExperimentalBadge", [1]) + '</span>',
+      NonStandardBadge  : '<span class="sidebar-icon">' + template("NonStandardBadge", [1]) + '</span>',
+      DeprecatedBadge   : '<span class="sidebar-icon">' + template("DeprecatedBadge", [1]) + '</span>',
+      ObsoleteBadge     : '<span class="sidebar-icon">' + template("ObsoleteBadge", [1]) + '</span>',
     }
 
     function buildSublist(pages, title, noCodeTags) {

@@ -47,7 +47,7 @@ class Renderer {
     }
   }
 
-  async render(source, pageEnvironment, cacheResult = false) {
+  render(source, pageEnvironment, cacheResult = false) {
     this.checkAllPagesInfo();
     const uri = pageEnvironment.path.toLowerCase();
     const cachedResult = this.allPagesInfo.getRenderedHtmlFromCache(uri);
@@ -55,7 +55,7 @@ class Renderer {
       const cachedErrors = this.errors.get(uri) || [];
       return { renderedHtml: cachedResult, errors: cachedErrors };
     }
-    const [result, errors] = await renderMacros(
+    const [result, errors] = renderMacros(
       source,
       this.templates,
       pageEnvironment,

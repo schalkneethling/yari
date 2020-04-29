@@ -495,7 +495,7 @@ const TEST_CASE = [
 
 describeMacro("svginfo", () => {
   beforeEachMacro((macro) => {
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       for (let locale of Object.keys(MOCK_PAGES)) {
         for (let page of Object.values(MOCK_PAGES[locale])) {
           if (url === page.url) {
@@ -514,7 +514,7 @@ describeMacro("svginfo", () => {
         });
       }
 
-      return assert.eventually.equal(macro.call(...test.input), test.output);
+      return assert.equal(macro.call(...test.input), test.output);
     });
   });
 });

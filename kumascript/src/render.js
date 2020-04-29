@@ -1,11 +1,8 @@
 /**
  * This file defines a render() function that takes as input a string
- * of text containing embedded KumaScript macros and asynchronously
+ * of text containing embedded KumaScript macros and synchronously
  * returns a string in which the embedded macros have been
- * expanded. The render() function itself does not include any
- * asynchronous code, but macros may be asynchronous (they can make
- * HTTP requests, and use `await` for example), so the render() method
- * is declared `async`.
+ * expanded.
  *
  * Macros are embedded in source documents within pairs of curly
  * braces {{...}}. The Parser object of parser.js is used to extract
@@ -88,7 +85,7 @@ function getPrerequisites(source) {
   return result;
 }
 
-async function render(source, templates, pageEnvironment, allPagesInfo) {
+function render(source, templates, pageEnvironment, allPagesInfo) {
   // Parse the source document.
   let tokens;
   try {
@@ -132,13 +129,13 @@ async function render(source, templates, pageEnvironment, allPagesInfo) {
   );
 
   // Loop through the tokens, rendering the macros and collecting
-  // the resulting promises. We detect duplicate invocations and
-  // only render those once, on the assumption that their output will
-  // be the same each time. (This is an important optimization for
-  // xref macros, for example, since they can make asynchronous
-  // network requests, and documents often have duplicate xrefs.)
-  let promises = [];
-  let signatureToPromiseIndex = new Map();
+  // the results. We detect duplicate invocations and only render
+  // those once, on the assumption that their output will be the
+  // same each time. (This is an important optimization for xref
+  // macros, for example, since documents often have duplicate
+  // xrefs.)
+  let results = [];
+  let signatureToResultIndex = new Map();
 
   // Keep track of errors that occur when rendering the macros.
   let errors = [];
@@ -176,51 +173,45 @@ async function render(source, templates, pageEnvironment, allPagesInfo) {
 
       // If this signature is already in the signature map, then we're
       // already running the macro and don't need to do anything here.
-      if (signatureToPromiseIndex.has(token.signature)) {
+      if (signatureToResultIndex.has(token.signature)) {
         continue;
       }
 
-      // Now start rendering this macro. Most macros are
-      // synchronous and very fast, but some may make network
-      // requests, so we treat them all as async and build up an
-      // array of promises.  Note that we will await on the
-      // entire array, not on each promise individually. That
-      // allows the macros to execute in parallel. We map this
-      // macro's signature to the index of its promise in the
-      // array so that later we can find the output for each
-      // macro.
-      let index = promises.length;
-      signatureToPromiseIndex.set(token.signature, index);
+      // Now render this macro. We map this macro's signature
+      // to the index of its result in the array so that later
+      // we can find the output for each macro.
+      let index = results.length;
+      signatureToResultIndex.set(token.signature, index);
       errors.push(null);
-      promises.push(
-        templates
-          .render(macroName, environment.getExecutionContext(token.args))
-          .catch((e) => {
-            // If there was an error rendering this macro, we still
-            // want the promise to resolve normally, otherwise the
-            // Promise.all() will fail. So we resolve to "", and
-            // store the error in the errors array.
-            if (
-              e instanceof ReferenceError &&
-              e.message.startsWith("Unknown macro")
-            ) {
-              // The named macro does not exist
-              errors[index] = new MacroNotFoundError(e, source, token);
-            } else if (e.name === "SyntaxError") {
-              // There was a syntax error compiling the macro
-              errors[index] = new MacroCompilationError(e, source, token);
-            } else {
-              // There was a runtime error executing the macro
-              errors[index] = new MacroExecutionError(e, source, token);
-            }
-            return "";
-          })
-      );
+      let result;
+      try {
+        result = templates.render(
+          macroName,
+          environment.getExecutionContext(token.args)
+        );
+      } catch (e) {
+        // If there was an error rendering this macro, we still
+        // want the promise to resolve normally, otherwise the
+        // Promise.all() will fail. So we resolve to "", and
+        // store the error in the errors array.
+        if (
+          e instanceof ReferenceError &&
+          e.message.startsWith("Unknown macro")
+        ) {
+          // The named macro does not exist
+          errors[index] = new MacroNotFoundError(e, source, token);
+        } else if (e.name === "SyntaxError") {
+          // There was a syntax error compiling the macro
+          errors[index] = new MacroCompilationError(e, source, token);
+        } else {
+          // There was a runtime error executing the macro
+          errors[index] = new MacroExecutionError(e, source, token);
+        }
+        result = "";
+      }
+      results.push(result);
     }
   }
-
-  // Now wait for all the promises to finish
-  let results = await Promise.all(promises);
 
   // And assemble the output document
   let output = tokens
@@ -243,8 +234,8 @@ async function render(source, templates, pageEnvironment, allPagesInfo) {
         // We've reached this point if either we're rendering all macros
         // or we're rendering selected macros and this is a macro we've
         // selected.
-        let promiseIndex = signatureToPromiseIndex.get(token.signature);
-        if (errors[promiseIndex]) {
+        let index = signatureToResultIndex.get(token.signature);
+        if (errors[index]) {
           // If there was an error rendering this macro, then we
           // just use the original macro source text for the output.
           return source.slice(
@@ -252,7 +243,7 @@ async function render(source, templates, pageEnvironment, allPagesInfo) {
             token.location.end.offset
           );
         }
-        return results[promiseIndex];
+        return results[index];
       } else {
         // If it isn't a MACRO token, it is a TEXT token
         return token.chars;

@@ -2,7 +2,6 @@
  * @prettier
  */
 const url = require("url");
-const got = require("got");
 
 const util = require("./util.js");
 
@@ -122,36 +121,13 @@ module.exports = {
 
   // Fetch an HTTP resource with JSON representation, parse the JSON and
   // return a JS object.
-  async fetchJSONResource(url, opts) {
-    opts = util.defaults(opts || {}, {
-      headers: {
-        "Cache-Control": this.env.cache_control,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
-    return JSON.parse(await this.MDN.fetchHTTPResource(url, opts));
+  fetchJSONResource(url, opts) {
+    throw new Error(`HTTP requests no longer allowed`);
   },
 
   // Fetch an HTTP resource, return the response body.
-  async fetchHTTPResource(url, opts) {
-    opts = util.defaults(opts || {}, {
-      method: "GET",
-      headers: {
-        Accept: "text/plain",
-        "Content-Type": "text/plain",
-      },
-      url: url,
-    });
-
-    try {
-      const response = await got(opts);
-      if (response.statusCode == 200) {
-        return response.body;
-      }
-    } catch (e) {}
-
-    return null;
+  fetchHTTPResource(url, opts) {
+    throw new Error(`HTTP requests no longer allowed`);
   },
 
   /* Derive the site URL from the request URL */

@@ -501,7 +501,7 @@ function testMacro(config) {
       macro.ctx.env.locale = locale;
       // Mock calls to L10n-Common, GroupData, and InterfaceData
       const originalTemplate = macro.ctx.template;
-      macro.ctx.template = jest.fn(async (name, ...args) => {
+      macro.ctx.template = jest.fn((name, ...args) => {
         if (name === "L10n:Common") {
           return commonl10nFixture;
         }
@@ -511,16 +511,12 @@ function testMacro(config) {
         if (name === "InterfaceData") {
           return config.interfaceData;
         }
-        return await originalTemplate(name, ...args);
+        return originalTemplate(name, ...args);
       });
       if (config.argument) {
-        return macro.call(config.argument).then(function (result) {
-          checkResult(result, config);
-        });
+        checkResult(macro.call(config.argument), config);
       } else {
-        return macro.call().then(function (result) {
-          checkResult(result, config);
-        });
+        checkResult(macro.call(), config);
       }
     });
   }

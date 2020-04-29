@@ -9,12 +9,12 @@ let slug = {
 };
 
 let URL = "/" + env.locale + "/docs/Web/SVG/" + mdn.localString(slug) + "/" + $0;
-let localStrings = string.deserialize(await template("L10n:Common"));
+let localStrings = string.deserialize(template("L10n:Common"));
 
 // Gather the page summary
 
 let term = $0;
-let page = await wiki.getPage(URL);
+let page = wiki.getPage(URL);
 let summary = "";
 if (page && page.summary) {
     summary = mdn.escapeQuotes(page.summary);

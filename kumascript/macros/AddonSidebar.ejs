@@ -602,7 +602,7 @@ var text = mdn.localStringMap({
     <li class="toggle">
       <details <%=currentPageIsUnder('WebExtensions/API')%>>
         <summary><%=text['WebExtensions/API']%></summary>
-        <%-await template("WebExtAPISidebar", [])%>
+        <%-template("WebExtAPISidebar", [])%>
       </details>
     </li>
 
@@ -610,7 +610,7 @@ var text = mdn.localStringMap({
       <details>
       <summary><%=text['WebExtensions/manifest.json']%></summary>
       <%-
-        await wiki.tree(baseURL + "WebExtensions/manifest.json", 1, 0, 0, 1)
+        wiki.tree(baseURL + "WebExtensions/manifest.json", 1, 0, 0, 1)
       %>
       </details>
     </li>

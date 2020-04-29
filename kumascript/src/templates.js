@@ -11,9 +11,7 @@
  * The render() method takes the name of a template and an execution
  * context object and renders the named template in that context. (See
  * the getExecutionContext() method of the Enviroment object to obtain
- * an execution context.) render() is declared async, so it returns
- * Promise<string> rather than returning a string directly, which
- * supports templates that are themselves async.
+ * an execution context.)
  *
  * render() relies on EJS's built-in caching and file-loading
  * capabilities so no template should ever need to be be loaded or
@@ -29,6 +27,8 @@ const fs = require("fs");
 const path = require("path");
 const ejs = require("ejs");
 const config = require("./config.js");
+
+const BOM = /^\uFEFF/;
 
 class Templates {
   constructor(macroDirectory = config.macrosDirectory) {
@@ -86,7 +86,7 @@ class Templates {
     }
   }
 
-  async render(name, args) {
+  render(name, args) {
     // Normalize the macro name by converting colons to hyphens and
     // uppercase letters to lowercase.
     name = name.replace(/:/g, "-").toLowerCase();
@@ -97,9 +97,16 @@ class Templates {
       throw new ReferenceError(`Unknown macro ${name}`);
     }
 
-    let rendered = await ejs.renderFile(path, args, {
+    let macroSrc;
+    if (!ejs.cache.get(path)) {
+      // We only want to read the macro source if it hasn't already been
+      // compiled and cached, because if we get a cache hit, the macro
+      // source will be ignored anyway.
+      macroSrc = fs.readFileSync(path, "utf8").toString().replace(BOM, "");
+    }
+    const rendered = ejs.render(macroSrc, args, {
       cache: true,
-      async: true,
+      filename: path,
     });
     return rendered.trim();
   }

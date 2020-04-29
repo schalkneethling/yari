@@ -19,14 +19,14 @@ switch (env.locale) {
     default: break;
 }
 
-let commonLocalStrings = string.deserialize(await template("L10n:Common"));
+let commonLocalStrings = string.deserialize(template("L10n:Common"));
 let sectionName = mdn.localString({
     "es": "Elemento",
     "en-US": "Element"
 });
 let url = "/" + env.locale + "/docs/Web/HTML/" + sectionName + "/" +
     elementName;
-let page = await wiki.getPage(url);
+let page = wiki.getPage(url);
 let summary = (page && page.summary) ? mdn.escapeQuotes(page.summary) :
     mdn.getLocalString(commonLocalStrings, "summary");
 

@@ -110,11 +110,11 @@ describeMacro("ListGroups", () => {
     });
     // Mock calls to GroupData
     const originalTemplate = macro.ctx.template;
-    macro.ctx.template = jest.fn(async (name, ...args) => {
+    macro.ctx.template = jest.fn((name, ...args) => {
       if (name === "GroupData") {
         return groupDataFixture;
       }
-      return await originalTemplate(name, ...args);
+      return originalTemplate(name, ...args);
     });
   });
 

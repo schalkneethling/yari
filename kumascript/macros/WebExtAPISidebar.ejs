@@ -12,7 +12,7 @@ var escapeQuotes = mdn.escapeQuotes;
 var htmlEscape = kuma.htmlEscape;
 var rtlLocales = ['ar', 'he', 'fa'];
 
-let commonl10n = string.deserialize(await template('L10n:Common'));
+let commonl10n = string.deserialize(template('L10n:Common'));
 
 let text = {
     'translate': mdn.getLocalString(commonl10n, '[Translate]'),
@@ -24,10 +24,10 @@ let text = {
 };
 
 var badges = {
-  ExperimentalBadge : '<span class="sidebar-icon">' + await template("ExperimentalBadge", [1]) + '</span>',
-  NonStandardBadge  : '<span class="sidebar-icon">' + await template("NonStandardBadge", [1]) + '</span>',
-  DeprecatedBadge   : '<span class="sidebar-icon">' + await template("DeprecatedBadge", [1]) + '</span>',
-  ObsoleteBadge     : '<span class="sidebar-icon">' + await template("ObsoleteBadge", [1]) + '</span>',
+  ExperimentalBadge : '<span class="sidebar-icon">' + template("ExperimentalBadge", [1]) + '</span>',
+  NonStandardBadge  : '<span class="sidebar-icon">' + template("NonStandardBadge", [1]) + '</span>',
+  DeprecatedBadge   : '<span class="sidebar-icon">' + template("DeprecatedBadge", [1]) + '</span>',
+  ObsoleteBadge     : '<span class="sidebar-icon">' + template("ObsoleteBadge", [1]) + '</span>',
 }
 
 function buildSublist(pages, title, ignoreBadges) {
@@ -137,10 +137,10 @@ function classifyPages(subpages) {
   return collection;
 }
 
-async function buildSidebarForSingleAPI(apiPath) {
+function buildSidebarForSingleAPI(apiPath) {
   output+= '<ol>';
 
-  var subpages = await pageModule.subpagesExpand(apiPath);
+  var subpages = pageModule.subpagesExpand(apiPath);
 
   var pageCollection = classifyPages(subpages);
 
@@ -160,20 +160,20 @@ async function buildSidebarForSingleAPI(apiPath) {
 output += '</ol>';
 }
 
-async function buildSidebarForAllAPIs() {
+function buildSidebarForAllAPIs() {
   output = "<ol>";
   var browserSupportURL = baseURL + "Mozilla/Add-ons/WebExtensions/Browser_support_for_JavaScript_APIs";
   var browserSupportTitle = "Browser support for JavaScript APIs";
   output +=  '<li><a href="' +  browserSupportURL + '">' + browserSupportTitle + '</a>';
 
-  var subpages = await pageModule.subpagesExpand(baseAPIPage);
+  var subpages = pageModule.subpagesExpand(baseAPIPage);
   for (var i = 0; i < subpages.length; i++) {
     var apiPage = subpages[i];
     var pieces = apiPage.url.split("/");
     var apiName = pieces.slice(-1);
     if (slug.indexOf(apiPage.slug) != -1) {
       output +=  '<li class="webextension-api-sidebar"><a href="' +  apiPage.url + '">' + apiName + '</a>';
-      await buildSidebarForSingleAPI(baseURL + apiPage.slug);
+      buildSidebarForSingleAPI(baseURL + apiPage.slug);
     }
     else {
       output +=  '<li><a href="' +  apiPage.url + '">' + apiName + '</a>';
@@ -185,7 +185,7 @@ output += '</ol>';
 }
 
 
-await buildSidebarForAllAPIs(baseURL);
+buildSidebarForAllAPIs(baseURL);
 %>
 
 <%-output%>

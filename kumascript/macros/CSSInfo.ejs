@@ -13,7 +13,7 @@ let atRule = $1;
 
 var data = require('mdn-data/css');
 let formattedError = "<span style=\"color:red;\">$1$</span>";
-let commonLocalStrings = string.deserialize(await template("L10n:Common"));
+let commonLocalStrings = string.deserialize(template("L10n:Common"));
 let locale = env.locale;
 let escapeQuotes = mdn.escapeQuotes;
 let localize = mdn.getLocalString;
@@ -22,7 +22,7 @@ let replacePlaceholders = mdn.replacePlaceholders;
 let localWiki = wiki;
 let currentPage = page;
 
-let cssLocalStrings = string.deserialize(await template("L10n:CSS"));
+let cssLocalStrings = string.deserialize(template("L10n:CSS"));
 let localStrings = require('mdn-data/l10n/css');
 
 /*
@@ -35,10 +35,10 @@ let localStrings = require('mdn-data/l10n/css');
   area - Area of the API (i.e. CSS, SVG, etc.)
   linkName - String to use as link label
 */
-async function createLink(apiName, area, linkName) {
+function createLink(apiName, area, linkName) {
     let formattedLinkName = linkName || apiName;
     let url = "/" + locale + "/docs/Web/" + (area || "CSS") + "/" + apiName;
-    let thisPage = await localWiki.getPage(url);
+    let thisPage = localWiki.getPage(url);
 
     if (currentPage.hasTag(thisPage, "CSS Function")) {
         formattedLinkName += "()";
@@ -62,17 +62,17 @@ async function createLink(apiName, area, linkName) {
 
   s - String to parse
 */
-async function parseMacros(s) {
+function parseMacros(s) {
     if (s === undefined) {
         return undefined;
     }
 
     var apiName = "";
     var area = "";
-    let parsedString = await string.asyncReplace(
+    let parsedString = string.replace(
         s,
         /\{\{(.+?)(?:\((.+?)\))?\}\}/g,
-        async function (match, macroName, paramsString) {
+        function (match, macroName, paramsString) {
             var params = paramsString ? paramsString.split(/, ?/) : [];
             params.forEach(function(param, index, params) {
               params[index] = params[index].toLowerCase().slice(1, -1);
@@ -97,7 +97,7 @@ async function parseMacros(s) {
                     area = "CSS";
             }
 
-            return await createLink(apiName, area, params[1]);
+            return createLink(apiName, area, params[1]);
         }
     );
     return parsedString;
@@ -150,10 +150,10 @@ function addAdditionalAppliesToOutput(output, property, cssInfo) {
 
   string - String to parse
 */
-async function getValueOutput(cssInfo, property, atRule) {
+function getValueOutput(cssInfo, property, atRule) {
     if (property === "relatedAtRule") {
         let url = "/" + locale + "/docs/Web/CSS/" + atRule;
-        let page = await localWiki.getPage(url);
+        let page = localWiki.getPage(url);
         let summary = (page && page.summary) ? escapeQuotes(page.summary) :
             localize(commonLocalStrings, "summary");
 
@@ -175,12 +175,12 @@ async function getValueOutput(cssInfo, property, atRule) {
                     return localizedString;
                 });
 
-            return await parseMacros(addAdditionalAppliesToOutput(parsedAnimationTypeValues.join(
+            return parseMacros(addAdditionalAppliesToOutput(parsedAnimationTypeValues.join(
                 localize(localStrings, "listSeparator")), property, cssInfo));
         } else {
             var propMatches = value.match(/^'(.+?)'$/);
             if (propMatches) {
-                return await getValueOutput(data.properties[propMatches[1]], property);
+                return getValueOutput(data.properties[propMatches[1]], property);
             } else {
                 if (property === "initial" && !localStrings.hasOwnProperty(value)) {
                     return '<code>' + value + '</code>';
@@ -192,7 +192,7 @@ async function getValueOutput(cssInfo, property, atRule) {
 
                     var output = addAdditionalAppliesToOutput(
                         replacedKeywords.join(", "), property, cssInfo);
-                    return await parseMacros(output);
+                    return parseMacros(output);
                 }
             }
         }
@@ -202,19 +202,19 @@ async function getValueOutput(cssInfo, property, atRule) {
         for(let longhand of value) {
             output += "<li>{{cssxref(\"" + longhand + "\")}}: " +
                 (data.properties.hasOwnProperty(longhand) ?
-                    await getValueOutput(data.properties[longhand], property) :
+                    getValueOutput(data.properties[longhand], property) :
                     replacePlaceholders(formattedError,
                         [localize(cssLocalStrings, "missing")])) +
                 "</li>";
         };
         output += "</ul>";
 
-        return await parseMacros(addAdditionalAppliesToOutput(output, property,
+        return parseMacros(addAdditionalAppliesToOutput(output, property,
             cssInfo));
     } else if (typeof value === "object") {
         var output = localizeString(value);
 
-        return await parseMacros(addAdditionalAppliesToOutput(output, property,
+        return parseMacros(addAdditionalAppliesToOutput(output, property,
             cssInfo));
     } else if (typeof value === "boolean") {
         return localize(localStrings, value ? "yes" : "no");
@@ -223,7 +223,7 @@ async function getValueOutput(cssInfo, property, atRule) {
             "missing")]);
     }
 
-    return await parseMacros(value);
+    return parseMacros(value);
 }
 
 
@@ -268,7 +268,7 @@ if (name === "preview-wiki-content") {
 
     properties = properties.concat({
         name: "initial",
-        label: await template("Xref_cssinitial")
+        label: template("Xref_cssinitial")
     });
 
     if (!atRule) {
@@ -281,7 +281,7 @@ if (name === "preview-wiki-content") {
     if (cssInfo.hasOwnProperty("inherited")) {
         properties = properties.concat({
             name: "inherited",
-            label: await template("Xref_cssinherited")
+            label: template("Xref_cssinherited")
         });
     }
 
@@ -298,7 +298,7 @@ if (name === "preview-wiki-content") {
     },
     {
         name: "computed",
-        label: await template("Xref_csscomputed")
+        label: template("Xref_csscomputed")
     });
 
     if (!atRule) {
@@ -323,7 +323,7 @@ if (name === "preview-wiki-content") {
     for(let property of properties) {
         result += "<tr>" +
             "<th scope=\"row\">" + property.label + "</th><td>" +
-            await getValueOutput(cssInfo, property.name, atRule) + "</td>";
+            getValueOutput(cssInfo, property.name, atRule) + "</td>";
     };
     result += "</tbody>" +
         "</table>";

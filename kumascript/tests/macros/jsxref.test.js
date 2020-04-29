@@ -18,7 +18,7 @@ describeMacro("jsxref", function () {
       expected =
         '<a href="' + glob_url + '">' + "<code>" + name + "</code></a>";
 
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       if (url === glob_url) {
         return {
           slug: js_ref_slug + partial_slug,
@@ -28,7 +28,7 @@ describeMacro("jsxref", function () {
       }
     });
 
-    return assert.eventually.equal(macro.call(name), expected);
+    return assert.equal(macro.call(name), expected);
   });
 
   itMacro("One argument (method by title)", function (macro) {
@@ -41,7 +41,7 @@ describeMacro("jsxref", function () {
       expected =
         '<a href="' + glob_url + '">' + "<code>" + name + "</code></a>";
 
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       if (url === glob_url) {
         return {
           slug: js_ref_slug + partial_slug,
@@ -51,7 +51,7 @@ describeMacro("jsxref", function () {
       }
     });
 
-    return assert.eventually.equal(macro.call(name), expected);
+    return assert.equal(macro.call(name), expected);
   });
 
   itMacro("Two arguments (method by slug, display name)", function (macro) {
@@ -65,7 +65,7 @@ describeMacro("jsxref", function () {
       expected =
         '<a href="' + glob_url + '">' + "<code>" + name + "</code></a>";
 
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       if (url === glob_url) {
         return {
           slug: js_ref_slug + partial_slug,
@@ -75,7 +75,7 @@ describeMacro("jsxref", function () {
       }
     });
 
-    return assert.eventually.equal(macro.call(partial_slug, name), expected);
+    return assert.equal(macro.call(partial_slug, name), expected);
   });
 
   itMacro("Two arguments (non-global by slug, name)", function (macro) {
@@ -88,7 +88,7 @@ describeMacro("jsxref", function () {
       glob_url = js_ref_url + "Global_Objects/" + partial_slug,
       expected = '<a href="' + ref_url + '">' + "<code>" + name + "</code></a>";
 
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       if (url === ref_url) {
         return {
           slug: js_ref_slug + partial_slug,
@@ -98,7 +98,7 @@ describeMacro("jsxref", function () {
       }
     });
 
-    return assert.eventually.equal(macro.call(partial_slug, name), expected);
+    return assert.equal(macro.call(partial_slug, name), expected);
   });
 
   itMacro("Three arguments (slug, name, #anchor)", function (macro) {
@@ -119,7 +119,7 @@ describeMacro("jsxref", function () {
         name +
         "</code></a>";
 
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       if (url === glob_url) {
         return {
           slug: js_ref_slug + partial_slug,
@@ -129,10 +129,7 @@ describeMacro("jsxref", function () {
       }
     });
 
-    return assert.eventually.equal(
-      macro.call(partial_slug, name, anchor),
-      expected
-    );
+    return assert.equal(macro.call(partial_slug, name, anchor), expected);
   });
 
   itMacro("Three arguments (slug, name, anchor without hash) [ru]", function (
@@ -160,7 +157,7 @@ describeMacro("jsxref", function () {
 
     macro.ctx.env.locale = "ru";
 
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       if (url === glob_url) {
         return {
           slug: js_ref_slug + partial_slug,
@@ -170,10 +167,7 @@ describeMacro("jsxref", function () {
       }
     });
 
-    return assert.eventually.equal(
-      macro.call(partial_slug, name, anchor),
-      expected
-    );
+    return assert.equal(macro.call(partial_slug, name, anchor), expected);
   });
 
   itMacro(
@@ -188,7 +182,7 @@ describeMacro("jsxref", function () {
         glob_url = js_ref_url + "Global_Objects/" + partial_slug,
         expected = '<a href="' + ref_url + '">' + name + "</a>";
 
-      macro.ctx.wiki.getPage = jest.fn(async (url) => {
+      macro.ctx.wiki.getPage = jest.fn((url) => {
         if (url === ref_url) {
           return {
             slug: js_ref_slug + partial_slug,
@@ -198,10 +192,7 @@ describeMacro("jsxref", function () {
         }
       });
 
-      return assert.eventually.equal(
-        macro.call(partial_slug, name, "", 1),
-        expected
-      );
+      return assert.equal(macro.call(partial_slug, name, "", 1), expected);
     }
   );
 
@@ -216,7 +207,7 @@ describeMacro("jsxref", function () {
       expected =
         '<a href="' + glob_url + '">' + "<code>" + name + "</code></a>";
 
-    macro.ctx.wiki.getPage = jest.fn(async (url) => {
+    macro.ctx.wiki.getPage = jest.fn((url) => {
       if (url === glob_url) {
         return {
           slug: js_ref_slug + partial_slug,
@@ -226,6 +217,6 @@ describeMacro("jsxref", function () {
       }
     });
 
-    return assert.eventually.equal(macro.call(partial_slug, name), expected);
+    return assert.equal(macro.call(partial_slug, name), expected);
   });
 });

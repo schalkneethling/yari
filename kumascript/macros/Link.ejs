@@ -4,7 +4,7 @@
 // Parameters:
 //  $0  Page link
 
-let page = await wiki.getPage($0);
+let page = wiki.getPage($0);
 let title = page.title;
 let summary = page.summary.replace(/<img[^>]*>/g," ");
 let url = page.url

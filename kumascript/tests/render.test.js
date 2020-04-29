@@ -25,46 +25,30 @@ describe("render() function", () => {
   });
 
   let cases = ["testcase1", "testcase2", "testcase3", "testcase4"];
-  it.each(cases)("handles basic rendering %s", async (casedir) => {
+  it.each(cases)("handles basic rendering %s", (casedir) => {
     let input = get(casedir + "/input");
     let expected = get(casedir + "/output");
     let templates = new Templates(fixture(casedir + "/macros"));
-    let [result, errors] = await render(input, templates, {});
+    let [result, errors] = render(input, templates, {});
     expect(result).toEqual(expected);
     expect(errors).toEqual([]);
   });
 
-  it.each(["render", "remove"])("handles selective %s", async (mode) => {
+  it.each(["render", "remove"])("handles selective %s", (mode) => {
     let input = get("testcase2/input");
     let expected = get(`testcase2/output_selective_${mode}`);
     let templates = new Templates(fixture("testcase2/macros"));
     let pageEnv = {
       selective_mode: [mode, ["Multi:Line:Macro", "頁尾附註", "MacroWithJson"]],
     };
-    let [result, errors] = await render(input, templates, pageEnv);
+    let [result, errors] = render(input, templates, pageEnv);
     expect(result).toEqual(expected);
     expect(errors).toEqual([]);
   });
 
-  it("renders asynchronous macros", async () => {
-    jest.useFakeTimers();
-    async function after(delay, value) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => resolve(value), delay);
-      });
-    }
-
+  it("exposes the per-page env object", () => {
     let templates = new Templates(fixture("macros"));
-    let promise = render("{{async1}} {{async2}}", templates, { after });
-    jest.runAllTimers();
-    let [result, errors] = await promise;
-    expect(errors.length).toBe(0);
-    expect(result).toEqual("one two");
-  });
-
-  it("exposes the per-page env object", async () => {
-    let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render("{{env}}", templates, {
+    let [result, errors] = render("{{env}}", templates, {
       x: 1,
       y: 2,
     });
@@ -73,10 +57,10 @@ describe("render() function", () => {
   });
 
   let syntaxCases = ["syntax1", "syntax2", "syntax3", "syntax4"];
-  it.each(syntaxCases)("handles syntax errors: %s", async (fn) => {
+  it.each(syntaxCases)("handles syntax errors: %s", (fn) => {
     let input = get(fn);
     // null templates since we expect errors before we render any
-    let [result, errors] = await render(input, null, {});
+    let [result, errors] = render(input, null, {});
     expect(result).toEqual(input);
     expect(Array.isArray(errors)).toBe(true);
     expect(errors.length).toBe(1);
@@ -87,9 +71,9 @@ describe("render() function", () => {
     expect(errors[0].message).toMatch(/^Syntax error at line \d+, column \d+/);
   });
 
-  it("handles undefined templates", async () => {
+  it("handles undefined templates", () => {
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render("foo{{nope}}bar", templates, {});
+    let [result, errors] = render("foo{{nope}}bar", templates, {});
     expect(result).toEqual("foo{{nope}}bar");
     expect(errors.length).toBe(1);
     expect(errors[0]).toBeInstanceOf(MacroNotFoundError);
@@ -98,9 +82,9 @@ describe("render() function", () => {
     expect(errors[0]).toHaveProperty("column");
   });
 
-  it("handles compilation errors", async () => {
+  it("handles compilation errors", () => {
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render("foo{{syntax}}bar", templates, {});
+    let [result, errors] = render("foo{{syntax}}bar", templates, {});
     expect(result).toEqual("foo{{syntax}}bar");
     expect(errors.length).toBe(1);
     expect(errors[0]).toBeInstanceOf(MacroCompilationError);
@@ -109,9 +93,9 @@ describe("render() function", () => {
     expect(errors[0]).toHaveProperty("column");
   });
 
-  it("handles execution errors", async () => {
+  it("handles execution errors", () => {
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render("foo{{throw}}bar", templates, {});
+    let [result, errors] = render("foo{{throw}}bar", templates, {});
     expect(result).toEqual("foo{{throw}}bar");
     expect(errors.length).toBe(1);
     expect(errors[0]).toBeInstanceOf(MacroExecutionError);
@@ -120,13 +104,9 @@ describe("render() function", () => {
     expect(errors[0]).toHaveProperty("column");
   });
 
-  it("handles undefined variables in macros", async () => {
+  it("handles undefined variables in macros", () => {
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render(
-      "foo{{ undefined() }}bar",
-      templates,
-      {}
-    );
+    let [result, errors] = render("foo{{ undefined() }}bar", templates, {});
     expect(result).toEqual("foo{{ undefined() }}bar");
     expect(errors.length).toBe(1);
     expect(errors[0]).toBeInstanceOf(MacroExecutionError);
@@ -135,9 +115,9 @@ describe("render() function", () => {
     expect(errors[0]).toHaveProperty("column");
   });
 
-  it("handles multiple errors in one document", async () => {
+  it("handles multiple errors in one document", () => {
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render(
+    let [result, errors] = render(
       "foo{{nope(1)}}bar{{throw(2)}}baz{{syntax(3)}}",
       templates,
       {}
@@ -149,9 +129,9 @@ describe("render() function", () => {
     expect(errors[2]).toBeInstanceOf(MacroCompilationError);
   });
 
-  it("handles success plus errors in one document", async () => {
+  it("handles success plus errors in one document", () => {
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render(
+    let [result, errors] = render(
       'foo{{echo("!")}} bar{{ throw(1,2) }}baz{{echo("?")}}',
       templates,
       {}
@@ -161,22 +141,18 @@ describe("render() function", () => {
     expect(errors[0]).toBeInstanceOf(MacroExecutionError);
   });
 
-  it("macros can include other macros with template()", async () => {
+  it("macros can include other macros with template()", () => {
     let input = "foo {{bar}} baz";
     let expected = "foo (included words) baz";
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render(input, templates, {});
+    let [result, errors] = render(input, templates, {});
     expect(result).toEqual(expected);
     expect(errors).toEqual([]);
   });
 
-  it("errors in included macros are reported", async () => {
+  it("errors in included macros are reported", () => {
     let templates = new Templates(fixture("macros"));
-    let [result, errors] = await render(
-      "foo{{includeError}}bar",
-      templates,
-      {}
-    );
+    let [result, errors] = render("foo{{includeError}}bar", templates, {});
     expect(result).toEqual("foo{{includeError}}bar");
     expect(errors.length).toBe(1);
     expect(errors[0]).toBeInstanceOf(MacroExecutionError);

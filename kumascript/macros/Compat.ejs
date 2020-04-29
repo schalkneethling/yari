@@ -37,7 +37,7 @@ var output = '';
 var category = query.split(".")[0];
 var legendItems = new Set(); // entries will be unique
 
-var compatStrings = string.deserialize(await template('L10n:CompatTable'));
+var compatStrings = string.deserialize(template('L10n:CompatTable'));
 var localize = mdn.getLocalString;
 
 var s_no_data_found = mdn.localString({

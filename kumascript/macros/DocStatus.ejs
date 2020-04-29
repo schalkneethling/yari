@@ -19,12 +19,12 @@ if (slug.indexOf("/en-US") != -1) {
 } else {
     enURL = '/en-US/docs/' + slug;
 }
-var pageList = await page.subpagesExpand(enURL, '', true);
+var pageList = page.subpagesExpand(enURL, '', true);
 var missingPages = '';
 var groupTags = [];
 if ($1) {
     groupTags = JSON.parse($1);
-    missingPages = string.deserialize(await template("MissingPages"));
+    missingPages = string.deserialize(template("MissingPages"));
 }
 var outdate = $2;
 var bzddn = $3;
@@ -35,7 +35,7 @@ if ($6) {
     requiredTags = JSON.parse($6);
 }
 
-var languages = await page.translations(env.path);
+var languages = page.translations(env.path);
 var bugPageURL = 'https://bugzilla.mozilla.org/show_bug.cgi?id=';
 
 var metrics = {
@@ -275,12 +275,12 @@ if (groupTags.length > 0) {
 
 
 if (bzddn && bzddn != '') {
-    var ddnBugs = await MDN.bzSearch(bzddn);
+    var ddnBugs = MDN.bzSearch(bzddn);
     metrics.ddn.counter = ddnBugs.bugs.length;
 }
 
 if (bzdr && bzdr != '') {
-    var drBugs = await MDN.bzSearch(bzdr);
+    var drBugs = MDN.bzSearch(bzdr);
     metrics.dr.counter = drBugs.bugs.length;
 }
 
@@ -289,11 +289,11 @@ if (bzdr && bzdr != '') {
 
 var l10nResult = {};
 
-async function getL10nPages(pageList) {
+function getL10nPages(pageList) {
     if (pageList) {
         for (var aPage in pageList) {
             var url = 'https://developer.mozilla.org' + pageList[aPage].url + '?raw&macros&section=json';
-            var resource = await MDN.fetchHTTPResource(url);
+            var resource = MDN.fetchHTTPResource(url);
             if (resource != '') {
                 l10nResult[pageList[aPage].locale] = {};
                 l10nResult[pageList[aPage].locale].metrics = JSON.parse(resource);
@@ -303,7 +303,7 @@ async function getL10nPages(pageList) {
     }
 }
 
-await getL10nPages(languages);
+getL10nPages(languages);
 
 
 
@@ -364,9 +364,7 @@ if (output.hasOwnProperty(obj) && typeof metrics[obj] != 'undefined' && metrics[
 <h2 id="<%=metrics[obj].link.slice(1)%>"><%=metrics[obj].title%></h2>
 <%
     if (obj === 'requiredTags') {
-        let taglinks = await Promise.all(
-            requiredTags.map(t => template('Tag', [t]))
-        );
+        let taglinks = requiredTags.map(t => template('Tag', [t]));
 %>
 <p><small><em>At least missing one of the following</em>: <%- taglinks.join(', ') %></small></p>
 <%

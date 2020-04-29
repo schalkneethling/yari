@@ -45,8 +45,8 @@ describeMacro("Compat", function () {
     }
   );
 
-  itMacro("Outputs valid HTML", async (macro) => {
-    const result = await macro.call("api.feature");
+  itMacro("Outputs valid HTML", (macro) => {
+    const result = macro.call("api.feature");
     expect(lintHTML(result)).toBeFalsy();
   });
 
@@ -215,11 +215,11 @@ describeMacro("Compat", function () {
   );
   itMacro(
     "Creates correct feature labels for features with an MDN URL (non-'en-US' locale)",
-    async (macro) => {
+    (macro) => {
       macro.ctx.env.locale = "ja";
       macro.ctx.env.slug = "Web/HTTP/Headers/Content-Security-Policy";
 
-      let result = await macro.call("api.feature_with_mdn_url");
+      let result = macro.call("api.feature_with_mdn_url");
       let dom = JSDOM.fragment(result);
 
       assert.equal(
@@ -238,65 +238,60 @@ describeMacro("Compat", function () {
   );
   itMacro(
     "Creates correct labels for experimental/non-standard features",
-    function (macro) {
-      return macro.call("api.experimental_feature").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.equal(
-          dom.querySelector(".bc-table tbody tr th").textContent,
-          "experimental_feature Experimental"
-        );
-        assert.equal(
-          dom.querySelector(".bc-table tbody tr:nth-child(2) th").textContent,
-          "experimental_non-standard_sub_feature ExperimentalNon-standard"
-        );
-      });
+    (macro) => {
+      let result = macro.call("api.experimental_feature");
+      let dom = JSDOM.fragment(result);
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr th").textContent,
+        "experimental_feature Experimental"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr:nth-child(2) th").textContent,
+        "experimental_non-standard_sub_feature ExperimentalNon-standard"
+      );
     }
   );
   itMacro(
     "Creates correct labels for deprecated features with a description",
-    function (macro) {
-      return macro
-        .call("api.deprecated_feature_with_description")
-        .then(function (result) {
-          let dom = JSDOM.fragment(result);
-          assert.equal(
-            dom.querySelector(".bc-table tbody tr th").textContent,
-            "deprecated_feature_with_description Deprecated"
-          );
-          assert.equal(
-            dom.querySelector(".bc-table tbody tr:nth-child(2) th").textContent,
-            "Deprecated syntax Deprecated"
-          );
-        });
+    (macro) => {
+      let result = macro.call("api.deprecated_feature_with_description");
+      let dom = JSDOM.fragment(result);
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr th").textContent,
+        "deprecated_feature_with_description Deprecated"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr:nth-child(2) th").textContent,
+        "Deprecated syntax Deprecated"
+      );
     }
   );
 
   // Test different support cells, like yes, no, version, partial support
   // Tests support_variations.json
-  itMacro("Creates correct cell content for no support", function (macro) {
-    return macro.call("html.no_support").then(function (result) {
-      let dom = JSDOM.fragment(result);
-      assert.include(
-        Array.from(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-        ),
-        "bc-supports-no"
-      );
-      assert.equal(
-        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-          .textContent,
-        "No support"
-      );
-      assert.include(
-        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-        "No"
-      );
-    });
+  itMacro("Creates correct cell content for no support", (macro) => {
+    let result = macro.call("html.no_support");
+    let dom = JSDOM.fragment(result);
+    assert.include(
+      Array.from(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+      ),
+      "bc-supports-no"
+    );
+    assert.equal(
+      dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+        .textContent,
+      "No support"
+    );
+    assert.include(
+      dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+      "No"
+    );
   });
-  itMacro("Creates correct cell content for unknown version support", function (
-    macro
-  ) {
-    return macro.call("html.unknown_version_support").then(function (result) {
+  itMacro(
+    "Creates correct cell content for unknown version support",
+    (macro) => {
+      let result = macro.call("html.unknown_version_support");
       let dom = JSDOM.fragment(result);
       assert.include(
         Array.from(
@@ -313,460 +308,422 @@ describeMacro("Compat", function () {
         dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
         "Yes"
       );
-    });
-  });
+    }
+  );
   itMacro(
     "Creates correct cell content for support with a known version",
-    function (macro) {
-      return macro.call("html.versioned_support").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-          ),
-          "bc-supports-yes"
-        );
-        assert.equal(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-            .textContent,
-          "Full support"
-        );
-        assert.include(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-          "25"
-        );
-      });
+    (macro) => {
+      let result = macro.call("html.versioned_support");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-yes"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "Full support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        "25"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for removed support with known versions",
-    function (macro) {
-      return macro.call("html.removed_support").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-          ),
-          "bc-supports-no"
-        );
-        assert.equal(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-            .textContent,
-          "No support"
-        );
-        assert.include(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-          "25 — 35"
-        );
-      });
+    (macro) => {
+      let result = macro.call("html.removed_support");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-no"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "No support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        "25 — 35"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for removed support with unknown support start",
-    function (macro) {
-      return macro
-        .call("html.removed_support_unknown_start")
-        .then(function (result) {
-          let dom = JSDOM.fragment(result);
-          assert.include(
-            Array.from(
-              dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-            ),
-            "bc-supports-no"
-          );
-          assert.equal(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-              .textContent,
-            "No support"
-          );
-          assert.include(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-            "? — 35"
-          );
-        });
+    (macro) => {
+      let result = macro.call("html.removed_support_unknown_start");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-no"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "No support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        "? — 35"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for removed support with unknown support end",
-    function (macro) {
-      return macro
-        .call("html.removed_support_unknown_end")
-        .then(function (result) {
-          let dom = JSDOM.fragment(result);
-          assert.include(
-            Array.from(
-              dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-            ),
-            "bc-supports-no"
-          );
-          assert.equal(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-              .textContent,
-            "No support"
-          );
-          assert.include(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-            "25 — ?"
-          );
-        });
+    (macro) => {
+      let result = macro.call("html.removed_support_unknown_end");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-no"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "No support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        "25 — ?"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for removed support with unknown support range",
-    function (macro) {
-      return macro
-        .call("html.removed_support_unknown_range")
-        .then(function (result) {
-          let dom = JSDOM.fragment(result);
-          assert.include(
-            Array.from(
-              dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-            ),
-            "bc-supports-no"
-          );
-          assert.equal(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-              .textContent,
-            "No support"
-          );
-          assert.include(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-            "? — ?"
-          );
-        });
+    (macro) => {
+      let result = macro.call("html.removed_support_unknown_range");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-no"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "No support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        "? — ?"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for partial support and known version number",
-    function (macro) {
-      return macro
-        .call("html.partial_versioned_support")
-        .then(function (result) {
-          let dom = JSDOM.fragment(result);
-          assert.include(
-            Array.from(
-              dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-            ),
-            "bc-supports-partial"
-          );
-          assert.equal(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-              .textContent,
-            "Partial support"
-          );
-          assert.include(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-            "25"
-          );
-        });
+    (macro) => {
+      let result = macro.call("html.partial_versioned_support");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-partial"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "Partial support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        "25"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for partial support and unknown version number",
-    function (macro) {
-      return macro
-        .call("html.partial_unknown_version_support")
-        .then(function (result) {
-          let dom = JSDOM.fragment(result);
-          assert.include(
-            Array.from(
-              dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-            ),
-            "bc-supports-partial"
-          );
-          assert.equal(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-              .textContent,
-            "Partial support"
-          );
-          assert.include(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-            " Partial"
-          );
-        });
+    (macro) => {
+      let result = macro.call("html.partial_unknown_version_support");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-partial"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "Partial support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        " Partial"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for partial support and no support",
-    function (macro) {
-      return macro.call("html.partial_no_support").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-          ),
-          "bc-supports-partial"
-        );
-        assert.equal(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-            .textContent,
-          "Partial support"
-        );
-        assert.include(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-          " Partial"
-        );
-      });
+    (macro) => {
+      let result = macro.call("html.partial_no_support");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-partial"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "Partial support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        " Partial"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for partial support and unknown support",
-    function (macro) {
-      return macro.call("html.partial_unknown_support").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-          ),
-          "bc-supports-partial"
-        );
-        assert.equal(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-            .textContent,
-          "Partial support"
-        );
-        assert.include(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-          " Partial"
-        );
-      });
+    (macro) => {
+      let result = macro.call("html.partial_unknown_support");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-partial"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "Partial support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        " Partial"
+      );
     }
   );
   itMacro(
     "Creates correct cell content for partial support and removed support",
-    function (macro) {
-      return macro.call("html.partial_removed_support").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(
-            dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
-          ),
-          "bc-supports-no"
-        );
-        assert.equal(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
-            .textContent,
-          "No support"
-        );
-        assert.include(
-          dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
-          "25 — 35"
-        );
-      });
+    (macro) => {
+      let result = macro.call("html.partial_removed_support");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-table tbody tr td:nth-child(4)").classList
+        ),
+        "bc-supports-no"
+      );
+      assert.equal(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4) abbr span")
+          .textContent,
+        "No support"
+      );
+      assert.include(
+        dom.querySelector(".bc-table tbody tr td:nth-child(4)").textContent,
+        "25 — 35"
+      );
     }
   );
 
   // Test icons in main cells
   itMacro(
     "Adds an icon and a note section if a current main feature has an alternative name",
-    function (macro) {
-      return macro.call("alternative_name.feature").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(dom.querySelector(".bc-table tbody tr td").classList),
-          "bc-has-history"
-        );
-        assert.include(
-          Array.from(dom.querySelector(".bc-icons i").classList),
-          "ic-altname"
-        );
-      });
+    (macro) => {
+      let result = macro.call("alternative_name.feature");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(dom.querySelector(".bc-table tbody tr td").classList),
+        "bc-has-history"
+      );
+      assert.include(
+        Array.from(dom.querySelector(".bc-icons i").classList),
+        "ic-altname"
+      );
     }
   );
   itMacro(
     "Adds an icon and a note section if a current main feature has notes",
-    function (macro) {
-      return macro.call("notes.feature").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(dom.querySelector(".bc-table tbody tr td").classList),
-          "bc-has-history"
-        );
-        assert.include(
-          Array.from(dom.querySelector(".bc-icons i").classList),
-          "ic-footnote"
-        );
-      });
+    (macro) => {
+      let result = macro.call("notes.feature");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(dom.querySelector(".bc-table tbody tr td").classList),
+        "bc-has-history"
+      );
+      assert.include(
+        Array.from(dom.querySelector(".bc-icons i").classList),
+        "ic-footnote"
+      );
     }
   );
   itMacro(
     "Adds an icon and a note section if a current main feature has a flag",
-    function (macro) {
-      return macro.call("flags.feature").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(dom.querySelector(".bc-table tbody tr td").classList),
-          "bc-has-history"
-        );
-        assert.include(
-          Array.from(dom.querySelector(".bc-icons i").classList),
-          "ic-disabled"
-        );
-      });
+    (macro) => {
+      let result = macro.call("flags.feature");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(dom.querySelector(".bc-table tbody tr td").classList),
+        "bc-has-history"
+      );
+      assert.include(
+        Array.from(dom.querySelector(".bc-icons i").classList),
+        "ic-disabled"
+      );
     }
   );
   itMacro(
     "Adds an icon and a note section if a current main feature has a prefix",
-    function (macro) {
-      return macro.call("prefixes.feature").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(dom.querySelector(".bc-table tbody tr td").classList),
-          "bc-has-history"
-        );
-        assert.include(
-          Array.from(dom.querySelector(".bc-icons i").classList),
-          "ic-prefix"
-        );
-      });
+    (macro) => {
+      let result = macro.call("prefixes.feature");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(dom.querySelector(".bc-table tbody tr td").classList),
+        "bc-has-history"
+      );
+      assert.include(
+        Array.from(dom.querySelector(".bc-icons i").classList),
+        "ic-prefix"
+      );
     }
   );
   itMacro(
     "Adds a note icon if the first element in a support array has a note",
-    function (macro) {
-      return macro.call("notes.feature").then(function (result) {
-        let dom = JSDOM.fragment(result);
-        assert.include(
-          Array.from(
-            dom.querySelector(".bc-browser-firefox > .bc-icons > abbr > i")
-              .classList
-          ),
-          "ic-footnote"
-        );
-      });
+    (macro) => {
+      let result = macro.call("notes.feature");
+      let dom = JSDOM.fragment(result);
+      assert.include(
+        Array.from(
+          dom.querySelector(".bc-browser-firefox > .bc-icons > abbr > i")
+            .classList
+        ),
+        "ic-footnote"
+      );
     }
   );
 
   // Test flags
-  itMacro("Creates correct notes for flags", function (macro) {
-    return macro.call("flags.feature").then(function (result) {
-      let dom = JSDOM.fragment(result);
-      assert.equal(
-        dom.querySelectorAll("section.bc-history dl dd")[0].textContent,
-        "Disabled From version 10: this feature is behind the Enable experimental Web Platform features preference. To change preferences in Chrome, visit chrome://flags."
-      );
-      assert.equal(
-        dom.querySelectorAll("section.bc-history dl dd")[1].textContent,
-        "Disabled From version 17: this feature is behind the --number-format-to-parts runtime flag."
-      );
-      assert.equal(
-        dom.querySelectorAll("section.bc-history dl dd")[2].textContent,
-        ""
-      ); // empty for the "version_added: 12" range that has no flag
-      assert.equal(
-        dom.querySelectorAll("section.bc-history dl dd")[3].textContent,
-        "Disabled From version 5: this feature is behind the layout.css.vertical-text.enabled preference (needs to be set to true). To change preferences in Firefox, visit about:config."
-      );
-      assert.equal(
-        dom.querySelectorAll("section.bc-history dl dd")[4].textContent,
-        "Disabled From version 45: this feature is behind the foo.enabled preference and the bar.enabled preference."
-      );
-      assert.equal(
-        dom.querySelectorAll("section.bc-history dl dd")[5].textContent,
-        "Disabled From version 55 until version 60 (exclusive): this feature is behind the --datetime-format-to-parts compile flag."
-      );
-    });
+  itMacro("Creates correct notes for flags", (macro) => {
+    let result = macro.call("flags.feature");
+    let dom = JSDOM.fragment(result);
+    assert.equal(
+      dom.querySelectorAll("section.bc-history dl dd")[0].textContent,
+      "Disabled From version 10: this feature is behind the Enable experimental Web Platform features preference. To change preferences in Chrome, visit chrome://flags."
+    );
+    assert.equal(
+      dom.querySelectorAll("section.bc-history dl dd")[1].textContent,
+      "Disabled From version 17: this feature is behind the --number-format-to-parts runtime flag."
+    );
+    assert.equal(
+      dom.querySelectorAll("section.bc-history dl dd")[2].textContent,
+      ""
+    ); // empty for the "version_added: 12" range that has no flag
+    assert.equal(
+      dom.querySelectorAll("section.bc-history dl dd")[3].textContent,
+      "Disabled From version 5: this feature is behind the layout.css.vertical-text.enabled preference (needs to be set to true). To change preferences in Firefox, visit about:config."
+    );
+    assert.equal(
+      dom.querySelectorAll("section.bc-history dl dd")[4].textContent,
+      "Disabled From version 45: this feature is behind the foo.enabled preference and the bar.enabled preference."
+    );
+    assert.equal(
+      dom.querySelectorAll("section.bc-history dl dd")[5].textContent,
+      "Disabled From version 55 until version 60 (exclusive): this feature is behind the --datetime-format-to-parts compile flag."
+    );
   });
 
-  itMacro("Adds correct titles for platforms to head of table", function (
-    macro
-  ) {
-    return macro.call("javascript.feature").then(function (result) {
-      let dom = JSDOM.fragment(result);
-      assert.equal(
-        dom.querySelectorAll(".bc-platforms span")[0].textContent,
-        "Desktop"
-      );
-      assert.equal(
-        dom.querySelectorAll(".bc-platforms span")[1].textContent,
-        "Mobile"
-      );
-      assert.equal(
-        dom.querySelectorAll(".bc-platforms span")[2].textContent,
-        "Server"
-      );
-    });
+  itMacro("Adds correct titles for platforms to head of table", (macro) => {
+    let result = macro.call("javascript.feature");
+    let dom = JSDOM.fragment(result);
+    assert.equal(
+      dom.querySelectorAll(".bc-platforms span")[0].textContent,
+      "Desktop"
+    );
+    assert.equal(
+      dom.querySelectorAll(".bc-platforms span")[1].textContent,
+      "Mobile"
+    );
+    assert.equal(
+      dom.querySelectorAll(".bc-platforms span")[2].textContent,
+      "Server"
+    );
   });
 
-  itMacro("Adds correct classes for browsers to head of table", function (
-    macro
-  ) {
-    return macro.call("javascript.feature").then(function (result) {
-      let dom = JSDOM.fragment(result);
-      let browserIcons = Array.from(dom.querySelectorAll(".bc-browsers span"));
-      assert.equal(
-        browserIcons[0].classList.contains("bc-head-icon-chrome"),
-        true
-      );
-      assert.equal(
-        browserIcons[1].classList.contains("bc-head-icon-edge"),
-        true
-      );
-      assert.equal(
-        browserIcons[2].classList.contains("bc-head-icon-firefox"),
-        true
-      );
-      assert.equal(browserIcons[3].classList.contains("bc-head-icon-ie"), true);
-      assert.equal(
-        browserIcons[4].classList.contains("bc-head-icon-opera"),
-        true
-      );
-      assert.equal(
-        browserIcons[5].classList.contains("bc-head-icon-safari"),
-        true
-      );
-      assert.equal(
-        browserIcons[6].classList.contains("bc-head-icon-webview_android"),
-        true
-      );
-      assert.equal(
-        browserIcons[7].classList.contains("bc-head-icon-chrome_android"),
-        true
-      );
-      assert.equal(
-        browserIcons[8].classList.contains("bc-head-icon-firefox_android"),
-        true
-      );
-      assert.equal(
-        browserIcons[9].classList.contains("bc-head-icon-opera_android"),
-        true
-      );
-      assert.equal(
-        browserIcons[10].classList.contains("bc-head-icon-safari_ios"),
-        true
-      );
-      assert.equal(
-        browserIcons[11].classList.contains(
-          "bc-head-icon-samsunginternet_android"
-        ),
-        true
-      );
-      assert.equal(
-        browserIcons[12].classList.contains("bc-head-icon-nodejs"),
-        true
-      );
-    });
+  itMacro("Adds correct classes for browsers to head of table", (macro) => {
+    let result = macro.call("javascript.feature");
+    let dom = JSDOM.fragment(result);
+    let browserIcons = Array.from(dom.querySelectorAll(".bc-browsers span"));
+    assert.equal(
+      browserIcons[0].classList.contains("bc-head-icon-chrome"),
+      true
+    );
+    assert.equal(browserIcons[1].classList.contains("bc-head-icon-edge"), true);
+    assert.equal(
+      browserIcons[2].classList.contains("bc-head-icon-firefox"),
+      true
+    );
+    assert.equal(browserIcons[3].classList.contains("bc-head-icon-ie"), true);
+    assert.equal(
+      browserIcons[4].classList.contains("bc-head-icon-opera"),
+      true
+    );
+    assert.equal(
+      browserIcons[5].classList.contains("bc-head-icon-safari"),
+      true
+    );
+    assert.equal(
+      browserIcons[6].classList.contains("bc-head-icon-webview_android"),
+      true
+    );
+    assert.equal(
+      browserIcons[7].classList.contains("bc-head-icon-chrome_android"),
+      true
+    );
+    assert.equal(
+      browserIcons[8].classList.contains("bc-head-icon-firefox_android"),
+      true
+    );
+    assert.equal(
+      browserIcons[9].classList.contains("bc-head-icon-opera_android"),
+      true
+    );
+    assert.equal(
+      browserIcons[10].classList.contains("bc-head-icon-safari_ios"),
+      true
+    );
+    assert.equal(
+      browserIcons[11].classList.contains(
+        "bc-head-icon-samsunginternet_android"
+      ),
+      true
+    );
+    assert.equal(
+      browserIcons[12].classList.contains("bc-head-icon-nodejs"),
+      true
+    );
   });
 
-  itMacro("Adds correct text label for browsers to head of table", function (
-    macro
-  ) {
-    return macro.call("javascript.feature").then(function (result) {
-      let dom = JSDOM.fragment(result);
-      let browserIcons = Array.from(dom.querySelectorAll(".bc-browsers span"));
-      assert.equal(browserIcons[0].textContent, "Chrome");
-      assert.equal(browserIcons[1].textContent, "Edge");
-      assert.equal(browserIcons[2].textContent, "Firefox");
-      assert.equal(browserIcons[3].textContent, "Internet Explorer");
-      assert.equal(browserIcons[4].textContent, "Opera");
-      assert.equal(browserIcons[5].textContent, "Safari");
-      assert.equal(browserIcons[6].textContent, "Android webview");
-      assert.equal(browserIcons[7].textContent, "Chrome for Android");
-      assert.equal(browserIcons[8].textContent, "Firefox for Android");
-      assert.equal(browserIcons[9].textContent, "Opera for Android");
-      assert.equal(browserIcons[10].textContent, "Safari on iOS");
-      assert.equal(browserIcons[11].textContent, "Samsung Internet");
-      assert.equal(browserIcons[12].textContent, "Node.js");
-    });
+  itMacro("Adds correct text label for browsers to head of table", (macro) => {
+    let result = macro.call("javascript.feature");
+    let dom = JSDOM.fragment(result);
+    let browserIcons = Array.from(dom.querySelectorAll(".bc-browsers span"));
+    assert.equal(browserIcons[0].textContent, "Chrome");
+    assert.equal(browserIcons[1].textContent, "Edge");
+    assert.equal(browserIcons[2].textContent, "Firefox");
+    assert.equal(browserIcons[3].textContent, "Internet Explorer");
+    assert.equal(browserIcons[4].textContent, "Opera");
+    assert.equal(browserIcons[5].textContent, "Safari");
+    assert.equal(browserIcons[6].textContent, "Android webview");
+    assert.equal(browserIcons[7].textContent, "Chrome for Android");
+    assert.equal(browserIcons[8].textContent, "Firefox for Android");
+    assert.equal(browserIcons[9].textContent, "Opera for Android");
+    assert.equal(browserIcons[10].textContent, "Safari on iOS");
+    assert.equal(browserIcons[11].textContent, "Samsung Internet");
+    assert.equal(browserIcons[12].textContent, "Node.js");
   });
 });

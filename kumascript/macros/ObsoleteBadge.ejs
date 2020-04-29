@@ -81,6 +81,6 @@ str = mdn.localString({
     "en-US": "Obsolete"
 });
 
-%><%-await template("SimpleBadge", [str, "obsoleteBadge", titleAttrValue])%><%
+%><%-template("SimpleBadge", [str, "obsoleteBadge", titleAttrValue])%><%
 }
 %>
