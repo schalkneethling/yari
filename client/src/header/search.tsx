@@ -2,8 +2,8 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { useLocale } from "../hooks";
-import CloseIcon from "../kumastyles/general/close.svg";
-import SearchIcon from "../kumastyles/general/search.svg";
+import CloseIcon from "../kumastyles/icons/general/close.svg";
+import SearchIcon from "../kumastyles/icons/general/search.svg";
 
 export default function Search() {
   const locale = useLocale();

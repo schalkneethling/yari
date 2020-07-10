@@ -17,7 +17,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 
-import CloseIcon from "../kumastyles/general/close.svg";
+import CloseIcon from "../kumastyles/icons/general/close.svg";
 import { CATEGORY_MONTHLY_PAYMENTS, useGA } from "../ga-context";
 import { useLocale } from "../hooks";
 import { useUserData } from "../user-context";
