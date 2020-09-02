@@ -74,7 +74,7 @@
     "swr": "0.3.2",
     "ts-loader": "^8.0.3",
     "typeface-zilla-slab": "0.0.72",
-    "typescript": "^3.9.7",
+    "typescript": "^4.0.2",
     "use-debounce": "^3.4.3",
     "webpack-cli": "3.3.12",
     "webpack-node-externals": "2.5.2",
