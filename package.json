@@ -107,7 +107,7 @@
     "react-scripts": "3.4.4",
     "rough-notation": "0.4.0",
     "ts-loader": "^8.0.7",
-    "typescript": "^3.9.7",
+    "typescript": "^4.0.3",
     "vnu-jar": "^20.6.30"
   },
   "resolutions": {
